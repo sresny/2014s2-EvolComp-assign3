@@ -1,0 +1,7 @@
+Oct 17, 2014 12:41:59 PM jmetal.metaheuristics.nsgaII.NSGAII_main main
+INFO: Total execution time: 719312ms
+Oct 17, 2014 12:41:59 PM jmetal.metaheuristics.nsgaII.NSGAII_main main
+INFO: Variables values have been writen to file VAR
+Oct 17, 2014 12:41:59 PM jmetal.metaheuristics.nsgaII.NSGAII_main main
+INFO: Objectives values have been writen to file FUN
+
