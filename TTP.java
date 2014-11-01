@@ -61,14 +61,16 @@ public class TTP extends Problem {
       System.out.println("Error: solution type " + solutionType + " invalid") ;
       System.exit(-1) ;
     }
+
     try{
       readProblem(problemFile) ;
     }catch(IOException e){
-      System.out.println("Error: could not read problem file") ;
+      System.out.println("Error: could not read problem file "+e) ;
       System.exit(-1) ;
     }
 
-    length_ = new int[] {numberOfCities_,numberOfItems_};
+    length_ = new int[] {numberOfCities_-1,numberOfItems_};
+
  } // TTP
 	
 
@@ -202,20 +204,19 @@ public class TTP extends Problem {
     double time = 0.0;
     double velocity = maxVelocity_;
 
-    for(int i=0; i<numberOfCities_; i++){
-      int j = (i+1)%numberOfCities_;
+    int prev = 1;
+    for(int i=2; i<=numberOfCities_; i++){
 
-      int x = ((Permutation)solution.getDecisionVariables()[0]).vector_[i] ;
-      int y = ((Permutation)solution.getDecisionVariables()[0]).vector_[j] ;
-      
-      if(i>0){
-        BitSet currentItems = items_[i];
-        currentItems.and(((Binary)solution.getDecisionVariables()[1]).bits_);
-        for (int k = currentItems.nextSetBit(0); k >= 0; k = currentItems.nextSetBit(k+1)) {
-          weight += weights_[k];
-        }
-        velocity = maxVelocity_ - weight*( (maxVelocity_-minVelocity_)/maxWeight_ );
+      int x = ((Permutation)solution.getDecisionVariables()[0]).vector_[prev] ;
+      int y = ((Permutation)solution.getDecisionVariables()[0]).vector_[i] ;
+    
+      BitSet currentItems = items_[i];
+      currentItems.and(((Binary)solution.getDecisionVariables()[1]).bits_);
+      for (int k = currentItems.nextSetBit(0); k >= 0; k = currentItems.nextSetBit(k+1)) {
+        weight += weights_[k];
       }
+      velocity = maxVelocity_ - weight*( (maxVelocity_-minVelocity_)/maxWeight_ );
+
       distance += distances_[x][y];
       time += distances_[x][y]/velocity;
     }

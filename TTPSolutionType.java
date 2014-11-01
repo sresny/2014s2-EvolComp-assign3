@@ -51,7 +51,7 @@ public class TTPSolutionType extends SolutionType {
 		}
 		Variable [] variables = new Variable[2];
 		variables[0] = new Permutation(problem_.getLength(0)) ;
-	   	variables[1] = new Binary(problem_.getLength(0)) ;   
+	   	variables[1] = new Binary(problem_.getLength(1)) ;   
 	    
 	    return variables ;
 	} // createVariables
