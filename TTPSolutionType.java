@@ -19,7 +19,6 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package jmetal.encodings.solutionType;
 
 import jmetal.core.Problem;
 import jmetal.core.SolutionType;
@@ -31,14 +30,15 @@ import jmetal.encodings.variable.Binary;
  * Class representing the solution type of solutions composed of Permutation
  * variables 
  */
-public class TSPSolutionType extends SolutionType {
-
+public class TTPSolutionType extends SolutionType {
+	private Problem problem_;
 	/**
 	 * Constructor
 	 * @param problem  Problem to solve
 	 */
-	public TSPSolutionType(Problem problem) {
-			super(problem) ;
+	public TTPSolutionType(Problem problem) {
+		super(problem) ;
+		problem_ = problem;
 	  } // PermutationSolution
 	
 	/**
@@ -46,12 +46,12 @@ public class TSPSolutionType extends SolutionType {
 	 */
 	public Variable[]  createVariables() {
 		if(problem_.getNumberOfVariables() != 2){
-	    	System.out.println("Error: TSPSolutionType with " + str(problem_.getNumberOfVariables()) + " variables is invalid") ;
+	    	System.out.println("Error: TSPSolutionType with " + String.valueOf(problem_.getNumberOfVariables()) + " variables is invalid") ;
 	    	System.exit(-1) ;
 		}
 		Variable [] variables = new Variable[2];
-		variables[0] = new Permutation(problem_.getNumberOfCities()) ;
-	   	variables[1] = new Binary(problem_.getNumberOfItems()) ;   
+		variables[0] = new Permutation(problem_.getLength(0)) ;
+	   	variables[1] = new Binary(problem_.getLength(0)) ;   
 	    
 	    return variables ;
 	} // createVariables

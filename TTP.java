@@ -18,13 +18,14 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package jmetal.problems;
 
 import jmetal.core.Problem;
 import jmetal.core.Solution;
-import jmetal.encodings.solutionType.BinaryRealSolutionType;
-import jmetal.encodings.solutionType.RealSolutionType;
+import jmetal.encodings.variable.Permutation;
+import jmetal.encodings.variable.Binary;
 import jmetal.util.JMException;
+import java.util.BitSet;
+import java.io.*;
 
 /**
  * Class representing problem of the Traveling Thief
@@ -33,30 +34,163 @@ public class TTP extends Problem {
 
   private int numberOfCities_;
   private int numberOfItems_;
+  private double maxVelocity_;
+  private double minVelocity_;
+  private double maxWeight_;
+  private BitSet[] items_;
   private double[][] distances_;
   private double[] values_;
   private double[] weights_;
+
+
  /**
   * Constructor.
   * Creates a default instance of the TTP.
   * @param solutionType The solution type must "IntSolutionType".
   */
-  public TTP(String solutionType, int numCities, int numObjects) {
+  public TTP(String solutionType, String problemFile) {
     numberOfVariables_   = 2;
-    numberOfCities_      = numCities;
-    numberOfItems_     = numObjects;
     numberOfObjectives_  = 3 ;
     numberOfConstraints_ = 1 ;
+
     problemName_         = "TTP";
 
     if (solutionType.compareTo("TTP") == 0)
-      solutionType_ = new PermutationSolutionType(this) ;
+      solutionType_ = new TTPSolutionType(this) ;
     else {
       System.out.println("Error: solution type " + solutionType + " invalid") ;
       System.exit(-1) ;
     }
+    try{
+      readProblem(problemFile) ;
+    }catch(IOException e){
+      System.out.println("Error: could not read problem file") ;
+      System.exit(-1) ;
+    }
+
+    length_ = new int[] {numberOfCities_,numberOfItems_};
  } // TTP
 	
+
+  private void readProblem(String file) throws IOException {
+    Reader inputFile = new BufferedReader(
+                       new InputStreamReader(
+                       new FileInputStream(file)));
+
+    StreamTokenizer token = new StreamTokenizer(inputFile);
+    try {
+      boolean found ;
+      found = false ;
+      
+      token.nextToken();
+      while(!found) {
+        if ((token.sval != null) && ((token.sval.compareTo("DIMENSION") == 0)))
+          found = true ;
+        else
+          token.nextToken() ;
+      } // while
+
+      token.nextToken() ;
+      token.nextToken() ;
+      
+      numberOfCities_ =  (int)token.nval ;
+
+      found = false;
+      token.nextToken();
+      while(!found) {
+        if ((token.sval != null) && ((token.sval.compareTo("ITEMS") == 0)))
+          found = true ;
+        else
+          token.nextToken() ;
+      } // while
+
+      token.nextToken() ;
+      token.nextToken() ; 
+
+      numberOfItems_ =  (int)token.nval ;
+
+      distances_ = new double[numberOfCities_][numberOfCities_] ;
+      values_ = new double[numberOfItems_] ;
+      weights_ = new double[numberOfItems_] ;
+      items_ = new BitSet[numberOfCities_];
+
+      // Find the string SECTION  
+      found = false ;
+      token.nextToken();
+      while(!found) {
+        if ((token.sval != null) && ((token.sval.compareTo("SECTION") == 0)))
+          found = true ;
+        else
+          token.nextToken() ;
+      } // while
+
+
+    // Read the data
+
+      for(int i =0; i<8; i++){
+        token.nextToken();
+      }
+
+      double [] c = new double[2*numberOfCities_] ;
+
+      for (int i = 0; i < numberOfCities_; i++) {
+        token.nextToken() ;
+        int j = (int)token.nval ;
+        token.nextToken() ;
+        c[2*(j-1)] = token.nval ;
+        token.nextToken() ;
+        c[2*(j-1)+1] = token.nval ;
+      } // for
+
+      double dist ;
+      for (int k = 0; k < numberOfCities_; k++) {
+        distances_[k][k] = 0;
+        items_[k] = new BitSet(numberOfItems_);
+        for (int j = k + 1; j < numberOfCities_; j++) {
+          dist = Math.sqrt(Math.pow((c[k*2]-c[j*2]),2.0) +
+              Math.pow((c[k*2+1]-c[j*2+1]), 2));
+          distances_[k][j] = dist;
+          distances_[j][k] = dist;
+        } // for
+      } // for
+
+      // Find the string NUMBER  
+      found = false ;
+      token.nextToken();
+      while(!found) {
+        if ((token.sval != null) && ((token.sval.compareTo("NUMBER") == 0)))
+          found = true ;
+        else
+          token.nextToken() ;
+      }
+
+      token.nextToken();
+      token.nextToken();
+
+      for(int i=0; i<numberOfItems_;i++){
+        token.nextToken();
+        //Index
+        int j = (int)token.nval;
+
+        token.nextToken();
+        //Value
+        values_[j-1] = token.nval;
+
+        token.nextToken();
+        //Weight
+        weights_[j-1] = token.nval;
+
+        token.nextToken();
+        //City
+        items_[(int)token.nval-1].set(j-1);
+      }
+
+    } // try
+    catch (Exception e) { 
+      System.err.println ("TSP.readProblem(): error when reading data file "+e);
+      System.exit(1);
+    } // catch
+  } // readProblem
   /**
    * Evaluates a solution
    * @param solution The solution to evaluate
@@ -64,16 +198,31 @@ public class TTP extends Problem {
    */
   public void evaluate(Solution solution) throws JMException {
     double distance = 0.0;
+    double weight = 0.0;
+    double time = 0.0;
+    double velocity = maxVelocity_;
 
-    for(int i=0; i<numCities; i++){
-      j = (i+1)%numCities;
+    for(int i=0; i<numberOfCities_; i++){
+      int j = (i+1)%numberOfCities_;
 
+      int x = ((Permutation)solution.getDecisionVariables()[0]).vector_[i] ;
+      int y = ((Permutation)solution.getDecisionVariables()[0]).vector_[j] ;
+      
+      if(i>0){
+        BitSet currentItems = items_[i];
+        currentItems.and(((Binary)solution.getDecisionVariables()[1]).bits_);
+        for (int k = currentItems.nextSetBit(0); k >= 0; k = currentItems.nextSetBit(k+1)) {
+          weight += weights_[k];
+        }
+        velocity = maxVelocity_ - weight*( (maxVelocity_-minVelocity_)/maxWeight_ );
+      }
+      distance += distances_[x][y];
+      time += distances_[x][y]/velocity;
     }
-    solution.setObjective(0,f[0]);    
-    solution.setObjective(1,f[1]);
-    solution.setObjective(2,f[2]);
-    solution.setObjective(3,f[3]);
-    solution.setObjective(4,f[4]);
+
+    solution.setObjective(0,distance);    
+    solution.setObjective(1,weight);
+    solution.setObjective(2,time);
   } // evaluate
 
   /** 
@@ -82,32 +231,15 @@ public class TTP extends Problem {
    * @throws JMException 
    */  
   public void evaluateConstraints(Solution solution) throws JMException {
-    double [] constraint = new double[7]; // 7 constraints
-    double [] x          = new double[3]; // 3 objectives
-        
-    x[0] = solution.getDecisionVariables()[0].getValue();
-    x[1] = solution.getDecisionVariables()[1].getValue();
-    x[2] = solution.getDecisionVariables()[2].getValue();
- 
-    constraint[0] = 1 - (0.00139/(x[0]*x[1])+4.94*x[2]-0.08)             ;
-    constraint[1] = 1 - (0.000306/(x[0]*x[1])+1.082*x[2]-0.0986)         ;
-    constraint[2] = 50000 - (12.307/(x[0]*x[1]) + 49408.24*x[2]+4051.02) ;
-    constraint[3] = 16000 - (2.098/(x[0]*x[1])+8046.33*x[2]-696.71)      ;
-    constraint[4] = 10000 - (2.138/(x[0]*x[1])+7883.39*x[2]-705.04)      ;
-    constraint[5] = 2000 - (0.417*x[0]*x[1] + 1721.26*x[2]-136.54)       ;
-    constraint[6] = 550 - (0.164/(x[0]*x[1])+631.13*x[2]-54.48) ;
-    
-    double total = 0.0;
-    int number = 0;
-    for (int i = 0; i < numberOfConstraints_; i++) {
-      if (constraint[i]<0.0){
-        total+=constraint[i];
-        number++;
-      } // int
-    } // for
-        
-    solution.setOverallConstraintViolation(total);    
-    solution.setNumberOfViolatedConstraint(number);        
+    double weight = 0.0;
+    BitSet currentItems = ((Binary)solution.getDecisionVariables()[1]).bits_;
+    for (int k = currentItems.nextSetBit(0); k >= 0; k = currentItems.nextSetBit(k+1)) {
+      weight += weights_[k];
+    }
+    if(weight>maxWeight_){
+      solution.setOverallConstraintViolation(weight-maxWeight_);    
+      solution.setNumberOfViolatedConstraint(1);
+    }
   } // evaluateConstraints   
 
   @Override
@@ -125,11 +257,12 @@ public class TTP extends Problem {
   } // getUpperLimit 
 
   public int getNumberOfCities(){
-    return numberOfCities_
+    return numberOfCities_;
   }
 
   public int getNumberOfItems(){
-    return numberOfItems_
+    return numberOfItems_;
   }
+
 } // TSP
     
