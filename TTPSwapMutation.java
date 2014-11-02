@@ -23,9 +23,11 @@ import jmetal.operators.mutation.Mutation;
 
 import jmetal.core.Solution;
 import jmetal.encodings.variable.Permutation;
+import jmetal.encodings.variable.Binary;
 import jmetal.util.Configuration;
 import jmetal.util.JMException;
 import jmetal.util.PseudoRandom;
+import java.util.BitSet;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,10 +72,13 @@ public class TTPSwapMutation extends Mutation{
   public void doMutation(double probability, Solution solution) throws JMException {   
     int permutation[] ;
     int permutationLength ;
+    BitSet items;
+    BitSet[] cityItems;
 
     permutationLength = ((Permutation)solution.getDecisionVariables()[0]).getLength() ;
     permutation = ((Permutation)solution.getDecisionVariables()[0]).vector_ ;
-
+    items = ((Binary)solution.getDecisionVariables()[1]).bits_;
+    cityItems = ((TTP)solution.getProblem()).items_;
     if (PseudoRandom.randDouble() < probability) {
       int pos1 ;
       int pos2 ;
@@ -90,7 +95,25 @@ public class TTPSwapMutation extends Mutation{
       // swap
       int temp = permutation[pos1];
       permutation[pos1] = permutation[pos2];
-      permutation[pos2] = temp;    
+      permutation[pos2] = temp;
+
+      BitSet city1 = cityItems[permutation[pos1]+1];
+      BitSet city2 = cityItems[permutation[pos2]+1];
+
+      BitSet items1 = ((BitSet)items.clone());
+      items1.and(city1);
+      BitSet items2 = ((BitSet)items.clone());
+      items2.and(city2);
+      int i = items1.nextSetBit(0);
+      int j = items2.nextSetBit(0);
+
+      if(i>0 && j<0){
+        items.set(j,true);
+        items.set(i,false);
+      }else if(j>0 && i<0){
+        items.set(i,true);
+        items.set(j,false);
+      }
     } // if
   } // doMutation
 

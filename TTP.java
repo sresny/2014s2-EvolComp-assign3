@@ -37,7 +37,7 @@ public class TTP extends Problem {
   private double maxVelocity_;
   private double minVelocity_;
   private double maxWeight_;
-  private BitSet[] items_;
+  public BitSet[] items_;
   private double[][] distances_;
   private double[] values_;
   private double[] weights_;
@@ -205,10 +205,13 @@ public class TTP extends Problem {
     double velocity = maxVelocity_;
 
     int prev = 1;
-    for(int i=2; i<=numberOfCities_; i++){
+    for(int i=2; i<numberOfCities_; i++){
 
-      int x = ((Permutation)solution.getDecisionVariables()[0]).vector_[prev] ;
-      int y = ((Permutation)solution.getDecisionVariables()[0]).vector_[i] ;
+      int x = ((Permutation)solution.getDecisionVariables()[0]).vector_[prev-1] ;
+      int y = ((Permutation)solution.getDecisionVariables()[0]).vector_[i-1] ;
+
+      distance += distances_[x][y];
+      time += distances_[x][y]/velocity;
     
       BitSet currentItems = items_[i];
       currentItems.and(((Binary)solution.getDecisionVariables()[1]).bits_);
@@ -217,9 +220,11 @@ public class TTP extends Problem {
       }
       velocity = maxVelocity_ - weight*( (maxVelocity_-minVelocity_)/maxWeight_ );
 
-      distance += distances_[x][y];
-      time += distances_[x][y]/velocity;
     }
+
+    int x = ((Permutation)solution.getDecisionVariables()[0]).vector_[prev-1] ;
+    distance += distances_[x][0];
+    time += distances_[x][0]/velocity;
 
     solution.setObjective(0,distance);    
     solution.setObjective(1,weight);

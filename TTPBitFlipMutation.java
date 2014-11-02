@@ -61,7 +61,7 @@ public class TTPBitFlipMutation extends Mutation {
 	 * @throws JMException
 	 */
 	public void doMutation(double probability, Solution solution) {
-		for (int i = 0; i < ((Binary) solution.getDecisionVariables()[i]).getNumberOfBits(); i++) {
+		for (int i = 0; i < ((Binary) solution.getDecisionVariables()[1]).getNumberOfBits(); i++) {
 			if (PseudoRandom.randDouble() < probability) {
 				((Binary) solution.getDecisionVariables()[1]).bits_.flip(i);
 			}
