@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="windows-1252" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2014-11-02T23:44:45</date>
+  <millis>1414934085343</millis>
+  <sequence>0</sequence>
+  <logger>jMetal</logger>
+  <level>INFO</level>
+  <class>main</class>
+  <method>main</method>
+  <thread>1</thread>
+  <message>Total execution time: 43931ms</message>
+</record>
+<record>
+  <date>2014-11-02T23:44:45</date>
+  <millis>1414934085358</millis>
+  <sequence>1</sequence>
+  <logger>jMetal</logger>
+  <level>INFO</level>
+  <class>main</class>
+  <method>main</method>
+  <thread>1</thread>
+  <message>Variables values have been writen to file VAR</message>
+</record>
+<record>
+  <date>2014-11-02T23:44:45</date>
+  <millis>1414934085361</millis>
+  <sequence>2</sequence>
+  <logger>jMetal</logger>
+  <level>INFO</level>
+  <class>main</class>
+  <method>main</method>
+  <thread>1</thread>
+  <message>Objectives values have been writen to file FUN</message>
+</record>
+</log>

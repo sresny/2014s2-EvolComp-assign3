@@ -153,15 +153,11 @@ public class TTP extends Problem {
       token.nextToken() ; 
       token.nextToken() ; 
 
-      maxVelocity_ =  (double)token.nval ;
+      maxVelocity_ =  (double)token.nval;
 
-      System.out.println(minVelocity_);
-      System.out.println(maxVelocity_);
-
-
-      distances_ = new double[numberOfCities_][numberOfCities_] ;
-      values_ = new double[numberOfItems_] ;
-      weights_ = new double[numberOfItems_] ;
+      distances_ = new double[numberOfCities_][numberOfCities_];
+      values_ = new double[numberOfItems_];
+      weights_ = new double[numberOfItems_];
       items_ = new BitSet[numberOfCities_];
 
       // Find the string SECTION  
@@ -267,7 +263,6 @@ public class TTP extends Problem {
         weight += weights_[k];
       }
       velocity = maxVelocity_ - weight*( (maxVelocity_-minVelocity_)/maxWeight_ );
-
     }
 
     int x = ((Permutation)solution.getDecisionVariables()[0]).vector_[prev-1] ;

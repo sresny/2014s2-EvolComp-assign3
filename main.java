@@ -102,10 +102,10 @@ public class main {
         algorithm = new NSGAII(problem);
       }else if(args[3].compareTo("SPEA2") == 0){
         algorithm = new SPEA2(problem);
-        algorithm.setInputParameter("archiveSize",Integer.valueOf(args[1]));
+        algorithm.setInputParameter("archiveSize",100);
       }else if(args[3].compareTo("IBEA") == 0){
         algorithm = new IBEA(problem);
-        algorithm.setInputParameter("archiveSize",Integer.valueOf(args[1]));
+        algorithm.setInputParameter("archiveSize",5);
       }else{
         algorithm = new NSGAII(problem);
         System.out.println("Error: "+args[3]+" is not a valid algorithm, please choose NSGAII, SPEA2 or IBEA");
