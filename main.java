@@ -159,6 +159,7 @@ public class main {
     logger_.info("Variables values have been writen to file VAR");
     population.printVariablesToFile("VAR");    
     logger_.info("Objectives values have been writen to file FUN");
+    //population.printObjectives();
     population.printObjectivesToFile("FUN");
   
     if (indicators != null) {
