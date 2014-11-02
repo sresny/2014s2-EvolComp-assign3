@@ -97,6 +97,7 @@ public class TTP extends Problem {
       
       numberOfCities_ =  (int)token.nval ;
 
+
       found = false;
       token.nextToken();
       while(!found) {
@@ -110,6 +111,53 @@ public class TTP extends Problem {
       token.nextToken() ; 
 
       numberOfItems_ =  (int)token.nval ;
+
+      found = false;
+      token.nextToken();
+      while(!found) {
+        if ((token.sval != null) && ((token.sval.compareTo("KNAPSACK") == 0)))
+          found = true ;
+        else
+          token.nextToken() ;
+      } // while
+
+      token.nextToken() ;
+      token.nextToken() ; 
+      maxWeight_ =  (double)token.nval ;
+
+      found = false;
+      token.nextToken();
+      while(!found) {
+        if ((token.sval != null) && ((token.sval.compareTo("MIN") == 0)))
+          found = true ;
+        else
+          token.nextToken() ;
+      } // while
+
+      token.nextToken() ;
+      token.nextToken() ; 
+      token.nextToken() ; 
+
+      minVelocity_ =  (double)token.nval ;
+
+      found = false;
+      token.nextToken();
+      while(!found) {
+        if ((token.sval != null) && ((token.sval.compareTo("MAX") == 0)))
+          found = true ;
+        else
+          token.nextToken() ;
+      } // while
+
+      token.nextToken() ;
+      token.nextToken() ; 
+      token.nextToken() ; 
+
+      maxVelocity_ =  (double)token.nval ;
+
+      System.out.println(minVelocity_);
+      System.out.println(maxVelocity_);
+
 
       distances_ = new double[numberOfCities_][numberOfCities_] ;
       values_ = new double[numberOfItems_] ;

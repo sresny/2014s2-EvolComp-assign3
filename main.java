@@ -85,7 +85,7 @@ public class main {
     QualityIndicator indicators ; // Object to get quality indicators
 
     if(args.length < 3){
-      System.out.println("USAGE: java main.java FILENAME POP_SIZE GENS [ALG]");
+      System.out.println("USAGE: java main FILENAME POP_SIZE GENS [ALG]");
       System.exit(0);
     }
 
@@ -97,19 +97,22 @@ public class main {
     indicators = null ;
     
     problem = new TTP("TTP",args[0]);
-
-    if(args[3].compareTo("NSGAII") == 0){
-      algorithm = new NSGAII(problem);
-    }else if(args[3].compareTo("SPEA2") == 0){
-      algorithm = new SPEA2(problem);
-      algorithm.setInputParameter("archiveSize",Integer.valueOf(args[1]));
-    }else if(args[3].compareTo("IBEA") == 0){
-      algorithm = new IBEA(problem);
-      algorithm.setInputParameter("archiveSize",Integer.valueOf(args[1]));
+    if(args.length == 4){
+      if(args[3].compareTo("NSGAII") == 0){
+        algorithm = new NSGAII(problem);
+      }else if(args[3].compareTo("SPEA2") == 0){
+        algorithm = new SPEA2(problem);
+        algorithm.setInputParameter("archiveSize",Integer.valueOf(args[1]));
+      }else if(args[3].compareTo("IBEA") == 0){
+        algorithm = new IBEA(problem);
+        algorithm.setInputParameter("archiveSize",Integer.valueOf(args[1]));
+      }else{
+        algorithm = new NSGAII(problem);
+        System.out.println("Error: "+args[3]+" is not a valid algorithm, please choose NSGAII, SPEA2 or IBEA");
+        System.exit(0);
+      }
     }else{
-      algorithm = new NSGAII(problem);
-      System.out.println("Error: "+args[3]+" is not a valid algorithm, please choose NSGAII, SPEA2 or IBEA");
-      System.exit(0);
+        algorithm = new NSGAII(problem);
     }
     //algorithm = new ssNSGAII(problem);
 
