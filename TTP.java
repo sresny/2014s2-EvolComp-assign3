@@ -288,7 +288,7 @@ public class TTP extends Problem {
 
     solution.setObjective(0,distance);    
     solution.setObjective(1,time*rentingRate_-value);
-    solution.setObjective(2,maxWeight-weight);
+    solution.setObjective(2,maxWeight_-weight);
   } // evaluate
 
   /** 
