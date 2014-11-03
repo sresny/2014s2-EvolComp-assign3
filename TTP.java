@@ -41,7 +41,7 @@ public class TTP extends Problem {
   private double[][] distances_;
   private double[] values_;
   private double[] weights_;
-
+  private double rentingRate_;
 
  /**
   * Constructor.
@@ -155,6 +155,21 @@ public class TTP extends Problem {
 
       maxVelocity_ =  (double)token.nval;
 
+      found = false;
+      token.nextToken();
+      while(!found) {
+        if ((token.sval != null) && ((token.sval.compareTo("RATIO") == 0)))
+          found = true ;
+        else
+          token.nextToken() ;
+      } // while
+
+      token.nextToken() ;
+      token.nextToken() ; 
+
+
+      rentingRate_ =  (double)token.nval;
+
       distances_ = new double[numberOfCities_][numberOfCities_];
       values_ = new double[numberOfItems_];
       weights_ = new double[numberOfItems_];
@@ -246,6 +261,7 @@ public class TTP extends Problem {
     double distance = 0.0;
     double weight = 0.0;
     double time = 0.0;
+    double value = 0.0;
     double velocity = maxVelocity_;
 
     int prev = 1;
@@ -261,6 +277,7 @@ public class TTP extends Problem {
       currentItems.and(((Binary)solution.getDecisionVariables()[1]).bits_);
       for (int k = currentItems.nextSetBit(0); k >= 0; k = currentItems.nextSetBit(k+1)) {
         weight += weights_[k];
+        value += values_[k];
       }
       velocity = maxVelocity_ - weight*( (maxVelocity_-minVelocity_)/maxWeight_ );
     }
@@ -270,8 +287,8 @@ public class TTP extends Problem {
     time += distances_[x][0]/velocity;
 
     solution.setObjective(0,distance);    
-    solution.setObjective(1,weight);
-    solution.setObjective(2,time);
+    solution.setObjective(1,time*rentingRate_-value);
+    solution.setObjective(2,maxWeight-weight);
   } // evaluate
 
   /** 
