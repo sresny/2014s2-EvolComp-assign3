@@ -1,9 +1,10 @@
 #!/bin/bash
 #A helper script for running simulations
-#compile driver
-javac main.java
+#Input - problem filenames
+#Output - a bunch of FUN, VAR and LOG files labelled with their algorithmic makeup
+echo "Usage: ./tester.sh [PROBLEM1, PROBLEM2, etc]"
 #for each problem file
-for PROBLEM in a280_n1395_uncorr-similar-weights_05.ttp  a280_n279_bounded-strongly-corr_01.ttp a280_n2790_uncorr_10.ttp
+javac main.java && for PROBLEM in "$@"
 do
 	#for each population size
 	for POPSIZE in 10 100
@@ -12,14 +13,16 @@ do
 		for NUMGEN in 100 1000 10000
 		do
 			#for each algorithm
-			for ALG in NSGAII SPEA2 IBEA
+			for ALG in NSGAII #SPEA2 IBEA
 			do
 				#run test
-				java main $PROBLEM $POPSIZE $NUMGEN $ALG 2>&1 >>TIM_$PROBLEM_using_$ALG_at_p$POPSIZE_g$NUMGEN.txt
+				#echo $PROBLEM $POPSIZE $NUMGEN $ALG
+				#echo FUN_${PROBLEM}_${POPSIZE}_${NUMGEN}_${ALG}
+				java main $PROBLEM $POPSIZE $NUMGEN $ALG 2>&1 |cat >>LOG_${PROBLEM}_${POPSIZE}_${NUMGEN}_${ALG}
 				#rename Function file
-				mv FUN FUN_$PROBLEM_using_$ALG_at_p$POPSIZE_g$NUMGEN.txt
+				mv FUN FUN_${PROBLEM}_${POPSIZE}_${NUMGEN}_${ALG}
 				#rename Variable file
-				mv VAR VAR_$PROBLEM_using_$ALG_at_p$POPSIZE_g$NUMGEN.txt
+				mv VAR VAR_${PROBLEM}_${POPSIZE}_${NUMGEN}_${ALG}
 			done
 		done
 	done

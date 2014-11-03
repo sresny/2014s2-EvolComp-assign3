@@ -10,7 +10,7 @@ Notes and Instructions:
 * For Q2, TTP and TTPSolutionType were adapted from JMetal classes
 * For Q3, TTPBitFlipMutation, TTPSwapMutation and TTPTwoPointsCrossover were implemented.
 * For experiments of Q4 and Q5, main.java provides the test driver
-	Usage: java main FILENAME POPULATION_SIZE NUMBER_OF_GENERATIONS ALG
+	Usage: java main FILENAME POPULATION_SIZE NUMBER_OF_GENERATIONS [ALG]
 	The algorithm is a choice of NSGAII, SPEA2, IBEA.
 
 
